@@ -11,7 +11,7 @@ elif command -v dnf >/dev/null; then
 fi
 
 echo "Initializing submodules"
-git submodule update --init
+git submodule update --init --recursive
 
 echo "Linking configuration"
 stow zsh vim nvim git tmux
