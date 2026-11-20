@@ -1,62 +1,37 @@
-# Sample gitconfig
-#
-
-[hub]
-        protocol = https
 [user]
-        name = Fabian von Feilitzsch
-        email = fabian@fabianism.us
+	name = Fabian von Feilitzsch
+	email = fabian@fabianism.us
+[alias]
+	st = status
+	co = checkout
+	ci = commit
+	br = branch
+	df = diff
+	dfs = diff --staged
+	logg = log --graph --decorate --oneline --abbrev-commit --all
+	pup = pull upstream
+	shorg = push -u origin
+	pl = pull
+	unstage = reset HEAD --
+	mylog = log --first-parent --no-merges
+[color]
+	ui = auto
+[core]
+	excludesfile = ~/.gitignore_global
+	editor = nvim
+[apply]
+	whitespace = nowarn
+[mergetool]
+	keepBackup = false
+[difftool]
+	prompt = false
+[push]
+	default = current
 [credential]
 	helper = cache
-[alias]
-        st = status
-        co = checkout
-        ci = commit
-        br = branch
-        df = diff
-        dfs = diff --staged
-        logg = log --graph --decorate --oneline --abbrev-commit --all
-        pup = pull upstream
-        shorg = push -u origin
-        switch = !legit switch \"$@\"
-        branches = !legit branches
-        sprout = !legit sprout \"$@\"
-        unpublish = !legit unpublish \"$@\"
-        harvest = !legit harvest \"$@\"
-        sync = !legit sync \"$@\"
-        publish = !legit publish \"$@\"
-        graft = !legit graft \"$@\"
-        f = flow
-        pl = pull
-        nuke = delete-branch
-        fublish = flow feature publish
-        fart = flow feature start
-        fix = flow hotfix start
-        unstage = reset HEAD --
-        mylog = log --first-parent --no-merges
-[color]
-        diff = auto
-        status = auto
-        branch = auto
-        ui = true
-[core]
-        excludesfile = ~/.gitignore_global
-        editor = vim
-[apply]
-        whitespace = nowarn
-[mergetool]
-        keepBackup = false
-[difftool]
-        prompt = false
-[push]
-        # See `git help config` (search for push.default)
-        # for more information on different options of the below setting.
-        #
-        # Setting to git 2.0 default to surpress warning message
-        default = current
 [credential "https://github.com"]
-	helper = 
+	helper =
 	helper = !gh auth git-credential
 [credential "https://gist.github.com"]
-	helper = 
+	helper =
 	helper = !gh auth git-credential

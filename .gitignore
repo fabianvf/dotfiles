@@ -1,5 +1,3 @@
-.vim/
-!.vim/bundle/Vundle.vim
-
 tmux/.tmux/plugins/*
 !tmux/.tmux/plugins/tpm
+vim/.vim/undo/

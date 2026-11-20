@@ -23,15 +23,6 @@ Plug 'wesQ3/vim-windowswap'
 Plug 'rodjek/vim-puppet'
 
 " ESSENTIALS
-Plug 'fabianvf/pytest.vim'
-nmap <silent><Leader>tF :Pytest file verbose<CR>
-nmap <silent><Leader>tc :Pytest class verbose<CR>
-nmap <silent><Leader>tm :Pytest method verbose<CR>
-nmap <silent><Leader>tf :Pytest function verbose<CR>
-nmap <silent><Leader>tdF :Pytest file verbose doctest<CR>
-nmap <silent><Leader>tdc :Pytest class verbose doctest<CR>
-nmap <silent><Leader>tdm :Pytest method verbose doctest<CR>
-nmap <silent><Leader>tdf :Pytest function verbose doctest<CR>
 
 Plug 'bling/vim-airline'
 let g:airline#extensions#hunks#enabled = 0
@@ -80,35 +71,9 @@ let NERDTreeIgnore = ['\.pyc$', '__pycache__']
 
 Plug 'tpope/vim-obsession'
 
-" Plug 'scrooloose/syntastic'
-" nnoremap <leader>s :SyntasticCheck<CR>
-" NOTE: Don't use syntastic with python; we use khuno for that
-" let g:syntastic_mode_map = { 'mode': 'active',
-"  \ 'active_filetypes': ['ruby'],
-"  \ 'passive_filetypes': [ 'html', 'rst', 'md', 'python'] }
-" let g:syntastic_python_checkers = ['flake8', 'python']
-" let g:syntastic_ruby_checkers = ['rubylint', 'mri']
-" let g:syntastic_javascript_checkers = ['jsxhint', 'jshint']
-" autocmd! BufEnter  *.jsx  let b:syntastic_checkers=['jsxhint']
-" Disable some features to make syntastic faster
-" let g:syntastic_enable_signs = 0
-" let g:syntastic_enable_balloons = 0
-" Non-blocking python checking
 Plug 'alfredodeza/khuno.vim'
 
 " NICE TO HAVE
-
-" Plug 'bling/vim-airline'
-" let g:airline_theme='tomorrow'
-" Show buffers in tabline
-" let g:airline#extensions#tabline#enabled = 1
-" Disable stuff I don't need to see
-" let g:airline#extensions#hunks#enabled = 0
-" let g:airline#extensions#bufferline#enabled = 1
-" let g:airline#extensions#tagbar#enabled = 0
-" let g:airline#extensions#virtualenv#enabled = 0
-" let g:airline#extensions#csv#enabled = 0
-Plug 'christoomey/vim-tmux-navigator'
 
 " Plug 'SirVer/ultisnips'
 " let g:UltiSnipsJumpForwardTrigger="<c-j>"
@@ -151,16 +116,17 @@ Plug 'airblade/vim-gitgutter', { 'branch': 'main' }
 " Set gitgutter's bindings manually to avoid clashes
 let g:gitgutter_map_keys = 0
 nmap <leader>gh <Plug>(GitGutterStageHunk)
-nmap <leader>gH <Plug>(GitGutterRevertHunk)
+nmap <leader>gH <Plug>(GitGutterUndoHunk)
 nmap [h <Plug>(GitGutterPrevHunk)
 nmap ]h <Plug>(GitGutterNextHunk)
 Plug 'tpope/vim-fugitive'
-map <leader>gs :Gstatus<CR>
-map <leader>gb :Gblame<CR>
+Plug 'tpope/vim-rhubarb'  " :GBrowse for GitHub
+map <leader>gs :Git<CR>
+map <leader>gb :Git blame<CR>
 " Open current file on Github
-map <leader>gB :Gbrowse -<CR>
+map <leader>gB :GBrowse<CR>
 " Open currently selected lines on Github
-vmap <leader>gB :Gbrowse -<CR>
+vmap <leader>gB :GBrowse<CR>
 map <leader>gr :Gread<CR>
 map <leader>gw :Gwrite<CR>
 noremap <Leader>gp :Git push<CR>

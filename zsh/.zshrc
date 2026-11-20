@@ -1,90 +1,66 @@
 #!/bin/zsh
-if [[ -x /opt/homebrew/bin/brew ]]; then
-  eval "$(/opt/homebrew/bin/brew shellenv zsh)"
-fi
-# shortcut to this dotfiles path is $ZSH
-export ZSH=$HOME/.dotfiles
+
+# Environment
+#############
+
+export EDITOR='nvim'
+export VISUAL='nvim'
 export ANSIBLE_NOCOWS=1
-export PATH=$PATH:~/scripts:~/.cabal/bin:~/bin
-export SHELL='/bin/zsh'
-export EDITOR='vim'
-export OSF=~/code/cos/osf.io
-export SCRAPI=~/code/cos/scrapi
 export GOPATH=$HOME/go
-export GOBIN=$HOME/go/bin
-export PATH=$PATH:$GOPATH/bin
-export PYTHONPATH=$PYTHONPATH:/usr/local/lib/python
-alias ansalon='telnet ansalonmud.net 8679'
 
+typeset -U path
+path=(
+  ~/bin
+  ~/.bin
+  $GOPATH/bin
+  $path
+)
 
-# typeset -U fpath
-fpath=(~/.zsh/oc $fpath)
-
-# Disable caps lock
-# setxkbmap -option caps:swapescape
-
-# source ~/dotfiles/tmux/tmuxinator.zsh
-
-
-alias g='git'
-command -v vimx >/dev/null 2>&1 && alias vim='vimx'
-command -v nvim >/dev/null 2>&1 && alias vim='nvim'
-alias gssh='SSH_AUTH_SOCK=~/.gnupg/S.gpg-agent.ssh && ssh'
-alias c='clear'
-alias mkpasswd='python -c "from passlib.hash import sha512_crypt; import getpass; print sha512_crypt.encrypt(getpass.getpass())"'
-# use .localrc for SUPER SECRET CRAP that you don't
-# want in your public, versioned repo.
-if [[ -a ~/.localrc ]]
-then
-  source ~/.localrc
+if [[ -d /opt/homebrew/opt/openjdk ]]; then
+  path=(/opt/homebrew/opt/openjdk/bin $path)
+  export JAVA_HOME="/opt/homebrew/opt/openjdk"
 fi
 
-# Source Prezto.
+# uv and friends
+[[ -f "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
+
+# use .localrc for machine-specific or secret things you don't want in the
+# repo, e.g. PROMPT_TAG
+[[ -f ~/.localrc ]] && source ~/.localrc
+
+# Prezto (also runs compinit)
+#############################
+
 if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
   source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 fi
 
-# initialize autocomplete here, otherwise functions won't be loaded
-autoload -U compinit
-compinit
+# Shell options
+###############
 
-# Make autoenv always work
-cd .
-# fortune -o -s -n 300 | cowsay -f dragon-and-cow | lolcat
+unsetopt correct correct_all
+unsetopt share_history
+setopt clobber
 
+bindkey '^R' history-incremental-search-backward
+bindkey '^E' end-of-line
+bindkey '^A' beginning-of-line
 
+# Prompt
+########
 
-export WORKON_HOME=~/Envs
-_virtualenvwrapper_script=$(command -v virtualenvwrapper.sh)
-if [[ "$?" = 0 ]]; then
-  source ${_virtualenvwrapper_script}
-fi
-
-pyclean () {
-        ZSH_PYCLEAN_PLACES=${*:-'.'}
-        noglob find ${ZSH_PYCLEAN_PLACES} -type f -name "*.py[co]" -delete
-        noglob find ${ZSH_PYCLEAN_PLACES} -type d -name "__pycache__" -delete
-}
-
-# added by travis gem
-[ -f /Users/fabian/.travis/travis.sh ] && source /Users/fabian/.travis/travis.sh
-
-# Show git branch
 setopt prompt_subst
 autoload -Uz vcs_info
 zstyle ':vcs_info:*' actionformats \
     '%F{5}(%f%s%F{5})%F{3}-%F{5}[%F{2}%b%F{3}|%F{1}%a%F{5}]%f '
 zstyle ':vcs_info:*' formats       \
     '%F{4}%s%F{3}%F{2}:%F{4}%F{2}%b%F{5}%f '
-zstyle ':vcs_info:(sv[nk]|bzr):*' branchformat '%b%F{1}:%F{3}%r'
+zstyle ':vcs_info:*' enable git
 
-zstyle ':vcs_info:*' enable git cvs svn
-
-# or use pre_cmd, see man zshcontrib
 vcs_info_wrapper() {
   vcs_info
   if [ -n "$vcs_info_msg_0_" ]; then
-    echo "%{$fg[grey]%}${vcs_info_msg_0_}%{$reset_color%}$del"
+    echo "%{$fg[grey]%}${vcs_info_msg_0_}%{$reset_color%}"
   fi
 }
 
@@ -144,169 +120,41 @@ if [[ -n "$PROMPT_TAG" ]]; then
   PROMPT="%K{1}%F{15}%B $PROMPT_TAG %b%f%k $PROMPT"
 fi
 
-function colours() {
+# Aliases
+#########
+
+alias g='git'
+alias c='clear'
+alias nv='nvim'
+command -v nvim >/dev/null 2>&1 && alias vim='nvim'
+alias reload!='source ~/.zshrc'
+alias py='python3'
+alias pyserv='python3 -m http.server'
+
+if [[ "$OSTYPE" == linux* ]] && command -v wl-copy >/dev/null 2>&1; then
+  alias pbcopy='wl-copy'
+  alias pbpaste='wl-paste'
+fi
+
+# Functions
+###########
+
+# Remove python compiled byte-code in either current directory or in a
+# list of specified directories
+pyclean() {
+    local places=${*:-'.'}
+    noglob find ${=places} -type f -name "*.py[co]" -delete
+    noglob find ${=places} -type d -name "__pycache__" -delete
+}
+
+colours() {
   for i in {0..255} ; do
       printf "\x1b[38;5;${i}mcolour${i}\n"
   done
 }
 
-export ANSIBLE_NOCOWS=1
-export ANDROID_HOME=/usr/local/opt/android-sdk
-
-export PATH=$PATH:~/.bin
-# Go Lang things
-export GOPATH=$HOME/Go
-export PATH=$PATH:$GOPATH/bin
-# GOROOT not needed for homebrew go - it figures it out automatically
-# export GOVERSION=$(brew list go | tail -n 1 | cut -d '/' -f 6)
-# export GOROOT=$(brew --prefix)/Cellar/go/$GOVERSION/libexec
-
-export EDITOR=vim  # Screw nano
-
-alias g='git'
-alias c='clear'
-alias flake="flake8"
-alias nosetests="nosetests --rednose"
-alias gssh='SSH_AUTH_SOCK=~/.gnupg/S.gpg-agent.ssh && ssh'
-alias reload!='source ~/.zshrc'
-
-autoload -U promptinit && promptinit
-
-# Disable autocorrect
-DISABLE_CORRECTION="true"
-unsetopt correct
-unsetopt correct_all
-
-# . ~/.bin/z.sh
-
-alias py="python"
-alias py3="python3"
-alias ipy="ipython"
-alias pyserv="python -m SimpleHTTPServer"
-alias pyserv3="python3 -m http.server"
-alias pt="py.test"
-alias nt="nosetests"
-
-# Conda environments
-alias wo="workon"
-alias de="deactivate"
-
-alias nv="nvim"
-export TERM='xterm-256color'
-
-# Remove python compiled byte-code in either current directory or in a
-# list of specified directories
-function pyclean() {
-    ZSH_PYCLEAN_PLACES=${*:-'.'}
-    find ${ZSH_PYCLEAN_PLACES} -type f -name "*.py[co]" -delete
-    find ${ZSH_PYCLEAN_PLACES} -type d -name "__pycache__" -delete
-}
-
-setopt no_share_history
-unsetopt share_history
-bindkey '^R' history-incremental-search-backward
-bindkey '^E' end-of-line
-bindkey '^A' beginning-of-line
-
-if which ruby >/dev/null && which gem >/dev/null; then
-    PATH="$(ruby -rrubygems -e 'puts Gem.user_dir')/bin:$PATH"
-fi
-
-export VAGRANT_DEFAULT_PROVIDER=libvirt
-unset GREP_OPTIONS
-alias npm-exec='PATH=$(npm bin):$PATH'
-alias go-exec='PATH=$GOPATH/bin:$PATH'
-
-setopt clobber
-alias rhciag='ag -l --silent --ignore fusor/fusor-ember-cli --ignore fusor/ui --ignore \*.po'
-alias keep-trying='while [ $? -ne 0 ] ; do sleep 2 && bash -c "$(fc -ln -1)" ; done'
-alias try-forever='while [ true ] ; do sleep 2 && bash -c "$(fc -ln -1)" ; done'
-alias please='sudo bash -c "$(fc -ln -1)"'
-alias yum='sudo dnf'
-alias sssh='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
-alias sscp='scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
-
-function kill-spotify {
-  local _processes=$(ps aux | grep com.spotify.Client | grep -v grep | awk '{print $2}')
-  while read -r _process; do
-    if [[ ! -z "${_process}" ]]; then
-      echo "Killing Spotify process (pid ${_process})"
-      while ((kill ${_process}) > /dev/null 2>&1); do
-        echo "Waiting for pid ${_process} to die..."
-        sleep 1
-      done
-    fi
-  done <<< "${_processes}"
-}
-
-function start-spotify {
-  local _processes=$(ps aux | grep com.spotify.Client | grep -v grep | awk '{print $2}')
-  if [[ ! -z "${_processes}" ]]; then
-    echo "Spotify is already running"
-  else
-    echo "Starting Spotify"
-    flatpak run com.spotify.Client > /var/log/spotify-script.log 2>&1
-  fi
-}
-
-function spotify {
-  local state=${1:-online}
-  local _proxy_pid="$(ps aux | grep 'ssh -f -N -D 0.0.0.0:1080 localhost' | grep -v grep | awk '{print $2}')"
-  case "${state}" in
-  "online")
-    if [[ -z "${_proxy_pid}" ]]; then
-      echo "Starting local socks proxy for Spotify"
-      ssh -f -N -D 0.0.0.0:1080 localhost
-      kill-spotify
-    fi
-    start-spotify
-    ;;
-  "offline")
-    if [[ ! -z "${_proxy_pid}" ]]; then
-      echo "Killing local socks proxy for Spotify running on pid ${_proxy_pid}"
-      kill ${_proxy_pid}
-    fi
-    start-spotify
-    ;;
-  "stop")
-    if [[ ! -z "${_proxy_pid}" ]]; then
-      echo "Killing local socks proxy for Spotify running on pid ${_proxy_pid}"
-      kill ${_proxy_pid}
-    fi
-    kill-spotify
-    ;;
-  "--help")
-    echo "USAGE: spotify online|offline|stop"
-    ;;
-  esac
-}
-
-function make_nfs_share {
-  _path="/nfs_data/$1"
-  if [ -d "$_path" ]
-  then
-    echo "$_path already exists"
-    grep -q -e "$_path \*(rw)" /etc/exports || (echo "$_path *(rw)" | sudo tee -a /etc/exports)
-    # skip
-  else
-    sudo mkdir -p $_path
-    sudo chmod -R +755 $_path
-    sudo chown -R 36:36 $_path
-    grep -q -e "$_path \*(rw)" /etc/exports || (echo "$_path *(rw)" | sudo tee -a /etc/exports)
-    echo "$_path share created"
-  fi
-  sudo exportfs -ra
-}
-
-if [[ -s "$(command -v activate.sh)" ]]; then
-  source $(which activate.sh)
-fi
-
-# added by travis gem
-[ -f /home/fabian/.travis/travis.sh ] && source /home/fabian/.travis/travis.sh
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+# Tool integrations
+###################
 
 # zoxide - the fasd/autojump replacement.
 # z <partial dir>  jump to best match     zi <partial>  fzf picker
@@ -314,25 +162,10 @@ export NVM_DIR="$HOME/.nvm"
 if command -v zoxide >/dev/null 2>&1; then
   eval "$(zoxide init zsh)"
 fi
-# export GOBIN=/home/fabian/Go/bin
-# export GOROOT=/usr/local/go
-# export PATH=$PATH:$GOROOT/bin
 
-if [[ -s "$(command -v oc)" ]]; then
+if command -v oc >/dev/null 2>&1; then
   source <(oc completion zsh)
 fi
 
-if [[ "$OSTYPE" == linux* ]] && command -v wl-copy >/dev/null 2>&1; then
-  alias pbcopy='wl-copy'
-  alias pbpaste='wl-paste'
-fi
-function kubesecret {
-  secret_name="${1}"
-  kubectl get secret ${secret_name} -o go-template='{{range $k,$v := .data}}{{printf "%s: " $k}}{{if not $v}}{{$v}}{{else}}{{$v | base64decode}}{{end}}{{"\n"}}{{end}}'
-}
-if [[ -d /opt/homebrew/opt/openjdk ]]; then
-  export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
-  export JAVA_HOME="/opt/homebrew/opt/openjdk"
-fi
-
-[[ -f "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
