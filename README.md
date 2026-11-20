@@ -30,7 +30,7 @@ Leader is `Space`. nvim uses the same `~/.vimrc`.
 - `<space-v>`: Vertical split.
 - `<C-p>`: Go to file.
 - `<space-r>`: Go to symbol in file.
-- `<space-f>`: Search current directory with ag or ack.
+- `<space-f>`: Search current directory (ripgrep, or ag).
 - `<space-/>`: Toggle comment.
 - `<space-d>`: Toggle file browser, `<space-D>` to reveal the current file.
 - `<space-h>` / `<space-l>`: Go to beginning/end of line.
@@ -38,6 +38,8 @@ Leader is `Space`. nvim uses the same `~/.vimrc`.
 - `<space-a>`: Copy whole file.
 - `<space-space-w>`: Strip trailing whitespace.
 - `<space-n>`: Toggle relative line numbers.
+- `<space-o>`: Toggle transparent background.
+- `<space-tab>`: Toggle a scratch buffer.
 - `<C-h|j|k|l>`: Move between vim splits and tmux panes.
 
 ### Tests (vim-test)
@@ -50,6 +52,7 @@ Leader is `Space`. nvim uses the same `~/.vimrc`.
 ### Python (jedi)
 
 - `<C-c>g`: Go to definition.
+- `<C-c>r`: Rename, `<C-c>u`: usages, `<C-c>d`: docs.
 
 ### Git
 

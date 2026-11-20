@@ -16,6 +16,17 @@ git submodule update --init
 echo "Linking configuration"
 stow zsh vim nvim git tmux
 
+echo "Setting up nvim's python provider"
+nvim_venv=~/.local/share/nvim/venv
+if command -v uv >/dev/null; then
+  [[ -d "$nvim_venv" ]] || uv venv -q "$nvim_venv"
+  uv pip install -q --python "$nvim_venv/bin/python" pynvim jedi
+else
+  [[ -d "$nvim_venv" ]] || python3 -m venv "$nvim_venv"
+  "$nvim_venv/bin/pip" install -q pynvim jedi
+fi
+nvim --headless +PlugInstall +qa
+
 echo "Installing tmux plugins"
 ~/.tmux/plugins/tpm/bin/install_plugins
 
