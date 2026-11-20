@@ -6,7 +6,6 @@ vim
 neovim
 zoxide
 fzf
-the_silver_searcher
 ripgrep
 jq
 gh

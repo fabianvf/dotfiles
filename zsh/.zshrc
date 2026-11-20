@@ -45,6 +45,9 @@ setopt clobber
 bindkey '^R' history-incremental-search-backward
 bindkey '^E' end-of-line
 bindkey '^A' beginning-of-line
+# prezto binds the application-mode arrows, some terminals send these
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
 
 # Prompt
 ########
