@@ -1,0 +1,30 @@
+#!/bin/sh
+#
+# xsel wrapper for copying over ssh from inside GNU screen.
+#
+# Programs like opencode copy with OSC 52, which screen drops unless it is
+# wrapped in a DCS passthrough, and even then screen silently drops anything
+# over ~768 bytes. When opencode also pipes the text to `xsel --input`, send
+# the OSC 52 straight to the terminal that screen is attached to instead,
+# skipping screen entirely. Everything else goes to the real xsel.
+
+real=/usr/bin/xsel
+
+input=false
+for arg in "$@"; do
+  case "$arg" in
+    -i|--input) input=true ;;
+  esac
+done
+
+if $input && [ -n "$STY" ] && [ -n "$SSH_CONNECTION" ] && [ -z "$WAYLAND_DISPLAY$DISPLAY" ]; then
+  seq="$(printf '\033]52;c;%s\a' "$(base64 -w0)")"
+  # the screen client(s) hold the ssh terminal; the SCREEN server has no tty
+  for tty in $(ps -u "$(id -u)" -o tty=,comm= | awk '$2 == "screen" && $1 != "?" { print $1 }'); do
+    printf '%s' "$seq" > "/dev/$tty" 2>/dev/null
+  done
+  exit 0
+fi
+
+[ -x "$real" ] || exit 1
+exec "$real" "$@"
